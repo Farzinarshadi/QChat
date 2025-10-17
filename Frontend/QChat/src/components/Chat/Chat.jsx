@@ -9,6 +9,7 @@ import emojy from '../../assets/images/happiness.png'
 
 
 export default function Chat() {
+    
     const id = useParams()
     const [Group, setGroup] = useState([])
     const [ShowEmojy, setShowEmojy] = useState(false)
