@@ -1,4 +1,5 @@
 .chat-sidebar-main {
+    position: relative;
     width: 20%;
     height: 90vh;
     border-radius: 9px;
@@ -10,11 +11,11 @@
 
 .chat-sidebar-item {
     width: 100%;
-    padding: 4px 6px;
+    padding: 6px 8px;
     box-sizing: border-box;
     border-bottom: 1px solid #111111;
     gap: 12px;
-    color:  #fff;
+    color: #fff;
     text-decoration: none;
 }
 
@@ -24,17 +25,17 @@
 }
 
 .chat-sidebar-item-image {
-    width: 50px;
-    height: 50px;
+    width: 55px;
+    height: 55px;
     border-radius: 50%;
 }
 
 .chat-item-name {
-    font-size: 16px
+    font-size: 17px;
 }
 
 .chat-item-followers {
-    font-size: 14px;
+    font-size: 15px;
 }
 
 .blue-tick {
@@ -44,4 +45,101 @@
 
 .name-and-member-count-flex {
     gap: 4px;
+}
+
+.change-sidebar-section {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    gap: 10px;
+    /* background-color: #17212b; */
+    padding: 9px 0;
+    border-top-left-radius: 9px;
+    border-top-right-radius: 9px;
+}
+
+.change-sidebar-item {
+    width: 50%;
+    padding: 3px 0;
+    font-size: 18px;
+    margin-bottom: 0px;
+    cursor: pointer;
+    color: #fff;
+    text-decoration: none;
+}
+
+.change-sidebar-item.active {
+    border-bottom: 2px solid #53FC18;
+}
+
+
+.not-found {
+    width: 100%;
+    font-size: 16px;
+    margin-top: 50px;
+    font-size: 16px
+}
+
+.sidebar-chat-name-text {
+    width: 100%;
+    display: flex;
+    align-items: start;
+    justify-content: start;
+    flex-direction: column;
+}
+
+
+.user-profile-section {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 6px 9px;
+    background-color: #17212b;
+    gap: 12px;
+    box-sizing: border-box;
+    cursor: pointer;
+    border-bottom-left-radius: 9px;
+    border-bottom-right-radius: 9px;
+}
+
+.user-profile-img {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+}
+
+.user-profile-name {
+    font-size: 18px;
+}
+
+.name-and-online-flex {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-profile-online {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    gap: 3px;
+}
+
+.is-online {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #9c9c9c;
+
+}
+
+.is-online.active {
+    background-color: #53FC18;
+}
+
+.chat-sliderbar-items {
+    width: 100%;
+    margin-top: 50px;
 }

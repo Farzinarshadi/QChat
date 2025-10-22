@@ -8,6 +8,7 @@ urlpatterns = [
     
     path('' , include('base_app.urls')),
     path('chat/' , include('chat_app.urls')),
+    path('auth/' , include('auth_app.urls')),
 ]
 
 if settings.DEBUG:

@@ -9,17 +9,24 @@
     padding-bottom: 0px;
     border-end-start-radius: 0;
     border-end-end-radius: 0;
+    flex-direction: column;
+    box-sizing: border-box;
 }
 
 .chat-info-section  {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     padding: 6px 9px;
     box-sizing: border-box;
-    border-bottom: 1px solid #111111;
+    background-color: #17212b;
+    box-sizing: border-box;
 }
 
 .chat-profile {
     width: 55px;
+    height: 55px;
     border-radius: 50%;
 }
 
@@ -108,4 +115,60 @@
 .emojy-item {
     font-size: 22px;
     cursor: pointer ;
+}
+
+.select-chat {
+    margin-top: 40%;
+    font-size: 17px;
+}
+
+.chat-messages-sec {
+    width: 100%;
+    flex-direction: column;
+    padding: 0 9px;
+    gap: 9px;
+    margin-top: 10px;
+    box-sizing: border-box;
+    margin-top: 60px;
+    margin-bottom: 60px;
+    overflow-y: auto;
+}
+
+.chat-message-item {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    gap: 6px;
+    padding: 6px 9px;
+    border-radius: 9px;
+    background-color: #17212b;
+    max-width: 250px;
+}
+
+.message-text {
+    font-size: 17px;
+}
+
+.seen-icon {
+    width: 18px;
+    height: 18px;
+    filter: invert(100%) sepia(8%) saturate(7500%) hue-rotate(208deg) brightness(111%) contrast(99%);
+}
+
+.chat-message-item-sec {
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.chat-message-item-sec.sender {
+    justify-content: end;
+    .chat-message-item {
+        background-color: #2b5278;
+        text-align: end;
+    }
+}
+
+.chat-message-item-sec.reciver {
+    justify-content: start;
 }

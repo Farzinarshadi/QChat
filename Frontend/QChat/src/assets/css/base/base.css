@@ -1,3 +1,35 @@
+:root{
+--bg:#0f1115;            /* پس‌زمینه کلی */
+--panel:#121316;         /* پس‌زمینه پنل/تراک */
+--thumb:#2f3740;         /* رنگ اصلی thumb */
+--thumb-accent:#4b5561;  /* هایلایت ملایم */
+--thumb-active:#587089;  /* هنگام hover/active */
+--shadow: rgba(0,0,0,0.6);
+--radius:10px;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--panel);
+  border-radius: var(--radius);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--thumb), var(--thumb-accent));
+  border-radius: var(--radius);
+  border: 2px solid var(--panel);
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--thumb-active), var(--thumb-accent));
+}
+
+
 @font-face {
     font-family: shabnam;
     src: url('../../fonts/YekanBakh-Regular.woff2');
@@ -5,7 +37,10 @@
 
 * {
     font-family: shabnam;
+    scrollbar-width: thin; /* none | thin | auto */
+    scrollbar-color: var(--thumb) var(--panel);
 }
+
 
 body {
     background-color: #000;

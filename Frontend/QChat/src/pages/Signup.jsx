@@ -2,6 +2,8 @@ import { Link } from 'react-router-dom'
 import '../assets/css/Auth/signin&signup.css'
 import { useEffect, useState } from 'react'
 import Alert from '@mui/material/Alert';
+import { API_URL, privateApi } from '../config/Base'
+import { useNavigate } from 'react-router-dom';
 
 
 export default function Signup() {
@@ -10,23 +12,53 @@ export default function Signup() {
     const [Password, setPassword] = useState('')
     const [Password2, setPassword2] = useState('')
 
-    const [ShowAlert, setShowAlert] = useState(false);
-    const [AlertText, setAlertText] = useState('');
-    
+    const [ShowAlert, setShowAlert] = useState(false)
+    const [AlertText, setAlertText] = useState('')
+    const [AlertType, setAlertType] = useState('error')
+
+
+    const navigate = useNavigate()
+
 
     const HandleSendSignUp = () => {
         if (Username.length <= 0) {
             setShowAlert(true)
             setAlertText('username is not true')
+            return;
         }
         if (Password.length <= 0) {
             setShowAlert(true)
             setAlertText('password is not true')
+            return;
         }
         if (Password2.length <= 0) {
             setShowAlert(true)
-            setAlertText('password is not true')
+            setAlertText('password 2 is not true')
+            return;
         }
+        if (Password != Password2) {
+            setShowAlert(true)
+            setAlertText('passwords do not match')
+            return;
+        }
+
+        privateApi.post('/auth/signup/', {
+            username: Username,
+            password: Password,
+            password2: Password2
+        })
+            .then((response) => {
+                setShowAlert(true)
+                setAlertType('success')
+                setAlertText('Sign Up Success')
+                setTimeout(() => {
+                    navigate('/signin')
+                }, 2000);
+            })
+            .catch((error) => {
+                setShowAlert(true)
+                setAlertText(error.response.data.error)
+            })
     }
 
     useEffect(() => {
@@ -43,7 +75,7 @@ export default function Signup() {
         <>
             {ShowAlert && (
                 <Alert
-                    severity="error"
+                    severity={AlertType}
                     variant='filled'
                     sx={{
                         position: "fixed",
