@@ -1,0 +1,80 @@
+.close-section {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.close-icon {
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+}
+
+.close-title {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.account-info-section {
+    width: 100%;
+    gap: 12px;
+    flex-direction: column;
+}
+
+.change-image-image {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.change-username-input,
+.change-bio-input {
+    width: 320px;
+    height: 40px;
+    border: 1px solid #17212b;
+    outline: 0;
+    font-size: 17px;
+    padding-inline-start: 9px;
+    background-color: #17212b;
+    color: #fff;
+    border-radius: 9px;
+}
+
+.change-username-input:focus,
+.change-bio-input:focus {
+    border: 1px solid #ccc;
+}
+
+.change-bio-input {
+    height: 150px;
+}
+
+
+.change-profile-input-section {
+    flex-direction: column;
+    gap: 9px;
+}
+
+.close-icons {
+    gap: 6px;
+}
+
+.save-button {
+    color: #fff;
+    gap: 3px;
+    background-color: #288406;
+    border: 0;
+    border-radius: 9px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.save-text {
+    font-size: 16px;
+}
+
+.save-icon {
+    font-size: 18px;
+}

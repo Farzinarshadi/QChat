@@ -40,7 +40,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
             is_read=is_read
         )
 
-
         await self.channel_layer.group_send(
             self.room_name,
             {

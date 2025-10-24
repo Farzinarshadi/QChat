@@ -4,14 +4,19 @@ import tick from '../../assets/images/blue tick.png'
 import { API_URL, privateApi } from '../../config/Base'
 import { Link, NavLink } from 'react-router-dom'
 import default_image from '../../assets/images/profile.png'
+import { FaChevronRight } from "react-icons/fa";
+import EditProfile from './EditProfile'
+
 
 export default function ChatSideBar({ Chats, Type }) {
     const userId = parseInt(localStorage.getItem('user_id'))
     const [User, setUser] = useState()
+    const [OpenEditProfile, setOpenEditProfile] = useState(false);
 
     useEffect(() => {
         privateApi.get('/auth/get_user/' + userId + '/')
             .then((response) => {
+                console.log('aaa',response.data)
                 setUser(response.data)
             })
             .catch((error) => {
@@ -21,6 +26,19 @@ export default function ChatSideBar({ Chats, Type }) {
 
     return (
         <div className="chat-sidebar-main flex-jc-start">
+
+            {/* Edit Profile Box */}
+            {
+                OpenEditProfile && (
+                    <>
+                        <div className="shadow" onClick={() => setOpenEditProfile(false)}></div>
+                        <div className="fixed-box">
+                            <EditProfile User={User} setOpenEditProfile={setOpenEditProfile} />   
+                        </div>
+                    </>
+                )
+            }
+
             <div className="change-sidebar-section flex-center">
                 <NavLink
                     to='/'
@@ -107,7 +125,7 @@ export default function ChatSideBar({ Chats, Type }) {
             </div>
 
             {/* Profile Section */}
-            <div className="user-profile-section flex-jc-start">
+            <div className="user-profile-section flex-jc-start" onClick={() => setOpenEditProfile(!OpenEditProfile)}>
                 <img src={User?.custom_profile?.image ? API_URL + User?.custom_profile?.image : default_image} className='user-profile-img' />
                 <div className="name-and-online-flex">
                     <div className="user-profile-name">{User?.username}</div>
@@ -116,6 +134,7 @@ export default function ChatSideBar({ Chats, Type }) {
                         <span className='is-online active'></span>
                     </div>
                 </div>
+                <FaChevronRight className='right-icon' />
             </div>
 
         </div>

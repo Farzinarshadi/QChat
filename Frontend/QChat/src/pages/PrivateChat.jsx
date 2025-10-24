@@ -13,27 +13,27 @@ import default_image from '../assets/images/profile.png'
 export default function PrivateChat() {
     const { sender, reciver } = useParams()
 
-    
+
     const [UserName, setUserName] = useState(null)
     const [UserImage, setUserImage] = useState(null)
     const [ShowEmojy, setShowEmojy] = useState(false)
     const [InputValue, setInputValue] = useState('')
     const [Messages, setMessages] = useState([])
     const userId = parseInt(localStorage.getItem('user_id'))
-    
+
     const [Chats, setChats] = useState([])
-    
+
     useEffect(() => {
         privateApi.get('/chat/get_inbox_messages/')
-        .then((response) => {
-            setChats(response.data)
-            console.log("a", response.data)
-        })
-        .catch((error) => {
-            console.log(error.response.data.error)
-        })
+            .then((response) => {
+                setChats(response.data)
+                console.log("a", response.data)
+            })
+            .catch((error) => {
+                console.log(error.response.data.error)
+            })
     }, [])
-    
+
     useEffect(() => {
         privateApi.get('/chat/get_messages/' + sender + '/' + reciver + '/')
             .then((response) => {
@@ -47,30 +47,30 @@ export default function PrivateChat() {
                     setUserName(response.data[0]?.sender_name)
                     setUserImage(response.data[0]?.sender_image)
                 }
-                
+
             })
             .catch((error) => {
                 console.log(error.response.data.error)
             })
-        }, [sender, reciver])
+    }, [sender, reciver])
 
-        
-        const [socket, setSocket] = useState(null);
-        
-        useEffect(() => {
-            if (!sender || !reciver) return;
-            
-            const ws = new WebSocket(`ws://localhost:8000/ws/chat/${sender}/${reciver}/`);
-            
-            ws.onopen = () => {
-                console.log('WebSocket connected ✅');
-            };
-            
-            ws.onmessage = (e) => {
-                const data = JSON.parse(e.data);
-                console.log("new message:", data);
-                
-                setMessages((prev) => [...prev, {
+
+    const [socket, setSocket] = useState(null);
+
+    useEffect(() => {
+        if (!sender || !reciver) return;
+
+        const ws = new WebSocket(`ws://localhost:8000/ws/chat/${sender}/${reciver}/`);
+
+        ws.onopen = () => {
+            console.log('WebSocket connected ✅');
+        };
+
+        ws.onmessage = (e) => {
+            const data = JSON.parse(e.data);
+            console.log("new message:", data);
+
+            setMessages((prev) => [...prev, {
                 id: data.id,
                 message: data.message,
                 sender: data.sender,
@@ -78,13 +78,13 @@ export default function PrivateChat() {
                 is_read: data.is_read,
             }]);
         };
-        
+
         ws.onclose = () => {
             console.log('WebSocket closed');
         };
-        
+
         setSocket(ws);
-        
+
         return () => ws.close();
     }, [sender, reciver]);
 
@@ -164,12 +164,33 @@ export default function PrivateChat() {
                                     />
                                     {
                                         InputValue && InputValue?.length > 0 ? (
-                                            <button
-                                                className='chat-send-button flex-center'
-                                                onClick={HandleSendWebsocket}
-                                            >
-                                                <img src={send} className='chat-send-icon' />
-                                            </button>
+                                            <>
+                                                <div
+                                                    className="emojy-wrapper"
+                                                    onMouseEnter={() => setShowEmojy(true)}
+                                                    onMouseLeave={() => setShowEmojy(false)}
+                                                >
+                                                    <button
+                                                        className='chat-send-button flex-center'
+                                                    >
+                                                        <img src={emojy} className='chat-emojy-icon' />
+                                                    </button>
+
+                                                    {ShowEmojy && (
+                                                        <div className="emojy-box">
+                                                            <div className="emojy-item flex-center" onClick={() => setInputValue(InputValue + '😂')}>😂</div>
+                                                            <div className="emojy-item flex-center" onClick={() => setInputValue(InputValue + '😐')}>😐</div>
+                                                            <div className="emojy-item flex-center" onClick={() => setInputValue(InputValue + '😭')}>😭</div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <button
+                                                    className='chat-send-button flex-center'
+                                                    onClick={HandleSendWebsocket}
+                                                >
+                                                    <img src={send} className='chat-send-icon' />
+                                                </button>
+                                            </>
                                         ) : (
                                             <>
                                                 <div
@@ -185,9 +206,9 @@ export default function PrivateChat() {
 
                                                     {ShowEmojy && (
                                                         <div className="emojy-box">
-                                                            <div className="emojy-item flex-center">😂</div>
-                                                            <div className="emojy-item flex-center">😐</div>
-                                                            <div className="emojy-item flex-center">😭</div>
+                                                            <div className="emojy-item flex-center" onClick={() => setInputValue(InputValue + '😂')}>😂</div>
+                                                            <div className="emojy-item flex-center" onClick={() => setInputValue(InputValue + '😐')}>😐</div>
+                                                            <div className="emojy-item flex-center" onClick={() => setInputValue(InputValue + '😭')}>😭</div>
                                                         </div>
                                                     )}
                                                 </div>

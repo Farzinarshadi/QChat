@@ -7,8 +7,6 @@
     box-sizing: border-box;
     position: relative;
     padding-bottom: 0px;
-    border-end-start-radius: 0;
-    border-end-end-radius: 0;
     flex-direction: column;
     box-sizing: border-box;
 }
@@ -89,6 +87,7 @@
 }
 
 .chat-emojy-icon {
+    user-select: none;
     width: 28px;
     height: 28px;
     cursor: pointer;
@@ -115,6 +114,7 @@
 .emojy-item {
     font-size: 22px;
     cursor: pointer ;
+    user-select: none;
 }
 
 .select-chat {
@@ -127,9 +127,8 @@
     flex-direction: column;
     padding: 0 9px;
     gap: 9px;
-    margin-top: 10px;
     box-sizing: border-box;
-    margin-top: 60px;
+    margin-top: 75px;
     margin-bottom: 60px;
     overflow-y: auto;
 }

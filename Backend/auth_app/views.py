@@ -1,10 +1,11 @@
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from .serializers import UserSerializer
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
+from .models import CustomProfile
+from rest_framework.decorators import api_view, permission_classes
 
 
 def get_refresh_token(user):
@@ -63,3 +64,19 @@ def get_user(request, user_id):
         return Response(serailzer.data, status=200)
     except Exception as e:
         return Response({'error':e},status=400)
+
+
+@api_view(['POST'])
+def update_profile(request):
+    try:
+        bio = request.data.get('bio')
+        image = request.FILES.get('image')
+        profile = CustomProfile.objects.filter(user=request.user).first()
+        if bio:
+            profile.bio = bio
+        if image:
+            profile.image = image
+        profile.save()
+        return Response({'success':'success'}, status=200)
+    except Exception as e:
+        return Response({'error':f'{e}'}, status=400)

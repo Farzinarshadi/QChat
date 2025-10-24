@@ -1,11 +1,16 @@
-:root{
---bg:#0f1115;            /* پس‌زمینه کلی */
---panel:#121316;         /* پس‌زمینه پنل/تراک */
---thumb:#2f3740;         /* رنگ اصلی thumb */
---thumb-accent:#4b5561;  /* هایلایت ملایم */
---thumb-active:#587089;  /* هنگام hover/active */
---shadow: rgba(0,0,0,0.6);
---radius:10px;
+:root {
+  --bg: #0f1115;
+  /* پس‌زمینه کلی */
+  --panel: #121316;
+  /* پس‌زمینه پنل/تراک */
+  --thumb: #2f3740;
+  /* رنگ اصلی thumb */
+  --thumb-accent: #4b5561;
+  /* هایلایت ملایم */
+  --thumb-active: #587089;
+  /* هنگام hover/active */
+  --shadow: rgba(0, 0, 0, 0.6);
+  --radius: 10px;
 }
 
 ::-webkit-scrollbar {
@@ -31,49 +36,78 @@
 
 
 @font-face {
-    font-family: shabnam;
-    src: url('../../fonts/YekanBakh-Regular.woff2');
+  font-family: shabnam;
+  src: url('../../fonts/YekanBakh-Regular.woff2');
 }
 
 * {
-    font-family: shabnam;
-    scrollbar-width: thin; /* none | thin | auto */
-    scrollbar-color: var(--thumb) var(--panel);
+  font-family: shabnam;
+  scrollbar-width: thin;
+  /* none | thin | auto */
+  scrollbar-color: var(--thumb) var(--panel);
 }
 
 
 body {
-    background-color: #000;
-    color: #fff;
-    margin: 0;
+  background-color: #000;
+  color: #fff;
+  margin: 0;
 }
 
 .flex-center {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .flex-jc-start {
-    display: flex;
-    align-items: center;
-    justify-content: start;
+  display: flex;
+  align-items: center;
+  justify-content: start;
 }
 
 .flex-jc-end {
-    display: flex;
-    align-items: center;
-    justify-content: end;
+  display: flex;
+  align-items: center;
+  justify-content: end;
 }
 
 .flex-ai-start {
-    display: flex;
-    align-items: start;
-    justify-content: center;
+  display: flex;
+  align-items: start;
+  justify-content: center;
 }
 
 .flex-ai-end {
-    display: flex;
-    align-items: end;
-    justify-content: start;
+  display: flex;
+  align-items: end;
+  justify-content: start;
+}
+
+.shadow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: #0f0f0fac;
+  z-index: 999;
+}
+
+.fixed-box {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #2e2e2e;
+  border-radius: 9px;
+  padding: 16px 18px;
+  box-sizing: border-box;
+  z-index: 9999;
+  display: flex;
+  align-items: start;
+  justify-content: start;
+  flex-direction: column;
+  min-width: 630px;
+  gap: 24px;
 }
