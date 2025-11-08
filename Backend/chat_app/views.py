@@ -2,7 +2,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view , permission_classes
 from . import models
-from .serializers import GroupsSerializer, MessageSerializer
+from .serializers import GroupsSerializer, MessageSerializer, GroupMessageSerializer
 from rest_framework import generics
 from django.db.models import Q
 from django.contrib.auth.models import User
@@ -70,6 +70,17 @@ def get_messages(request, sender_id, reciver_id):
         )
         serializer = MessageSerializer(messages , many=True)
         return Response(serializer.data,status=200)
+    except Exception as e:
+        return Response(e,status=400)
+    
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_group_messages(request, group_id):
+    try:
+        group_messages = models.GroupMessage.objects.filter(chat_id=group_id).order_by('date')
+        serializer = GroupMessageSerializer(group_messages, many=True)
+        return Response(serializer.data, status=200)
     except Exception as e:
         return Response(e,status=400)
 

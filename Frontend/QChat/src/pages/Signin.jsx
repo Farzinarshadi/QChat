@@ -4,12 +4,15 @@ import { useEffect, useState } from 'react'
 import Alert from '@mui/material/Alert';
 import { API_URL, privateApi } from '../config/Base'
 import { useNavigate } from 'react-router-dom';
+import { CircularProgress } from "@mui/material";
 
 
 export default function Signup() {
 
     const [Username, setUsername] = useState('')
     const [Password, setPassword] = useState('')
+    const [IsLoading, setIsLoading] = useState(false)
+
 
     const [ShowAlert, setShowAlert] = useState(false)
     const [AlertText, setAlertText] = useState('')
@@ -18,15 +21,22 @@ export default function Signup() {
     const navigate = useNavigate()
 
 
+    useEffect(() => {
+        document.title = 'QChat - Sign In'
+    })
+
     const HandleSendSignIn = () => {
+        setIsLoading(true)
         if (Username.length <= 0) {
             setShowAlert(true)
             setAlertText('username is not true')
+            setIsLoading(false)
             return;
         }
         if (Password.length <= 0) {
             setShowAlert(true)
             setAlertText('password is not true')
+            setIsLoading(false)
             return;
         }
 
@@ -37,7 +47,6 @@ export default function Signup() {
             .then((response) => {
                 localStorage.setItem('refresh', response.data.tokens.refresh)
                 localStorage.setItem('access', response.data.tokens.access)
-                localStorage.setItem('user_id', response.data.user_id)
 
                 setShowAlert(true)
                 setAlertType('success')
@@ -51,6 +60,9 @@ export default function Signup() {
             .catch((error) => {
                 setShowAlert(true)
                 setAlertText(error.response.data.error)
+            })
+            .finally(() => {
+                setIsLoading(false)
             })
     }
 
@@ -66,6 +78,7 @@ export default function Signup() {
 
     return (
         <>
+
             {ShowAlert && (
                 <Alert
                     severity={AlertType}
@@ -90,7 +103,15 @@ export default function Signup() {
                     <div className="auth-title flex-jc-start">Sign In</div>
                     <input className='auth-username-input' type="text" name='username' placeholder='Username' onChange={(e) => setUsername(e.target.value)} />
                     <input className='auth-password-input' type="password" name='password' placeholder='Password' onChange={(e) => setPassword(e.target.value)} />
-                    <button className='auth-button' onClick={HandleSendSignIn}>Submit</button>
+                    <button className='auth-button flex-center' onClick={HandleSendSignIn}>
+                        {
+                            IsLoading ? (
+                                <CircularProgress size={25}/>
+                            ) : (
+                                'Submit'
+                            )
+                        }
+                    </button>
 
                     {/* Change Section */}
                     <div className="change-section flex-jc-start">
@@ -101,6 +122,7 @@ export default function Signup() {
                 </div>
 
             </div>
+
         </>
     )
 }

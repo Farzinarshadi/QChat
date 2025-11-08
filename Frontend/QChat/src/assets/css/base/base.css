@@ -111,3 +111,18 @@ body {
   min-width: 630px;
   gap: 24px;
 }
+
+
+.link {
+  text-decoration: none;
+  color: #fff;
+}
+
+
+/* responsive */
+@media (max-width:800px) {
+  .fixed-box {
+    min-width: 330px;
+    gap: 24px;
+  }
+}

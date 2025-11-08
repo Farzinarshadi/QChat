@@ -6,6 +6,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from .models import CustomProfile
 from rest_framework.decorators import api_view, permission_classes
+from ratelimit.decorators import ratelimit
 
 
 def get_refresh_token(user):
@@ -16,6 +17,7 @@ def get_refresh_token(user):
     }
 
 
+@ratelimit(key='ip', rate='10/m', block=True)
 @api_view(['POST'])
 def auth_view(request, type):
 
@@ -57,13 +59,25 @@ def auth_view(request, type):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_user(request, user_id):
+def get_user(request):
     try:
-        user_object = User.objects.filter(id=user_id).first()
-        serailzer = UserSerializer(user_object)
-        return Response(serailzer.data, status=200)
+        user_object = User.objects.get(id=request.user.id)
+        serializer = UserSerializer(user_object)
+        return Response(serializer.data, status=200)
     except Exception as e:
         return Response({'error':e},status=400)
+    
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user_with_id(request , user_id):
+    try:
+        user_object = User.objects.get(id=user_id)
+        serializer = UserSerializer(user_object)
+        return Response(serializer.data, status=200)
+    except Exception as e:
+        print(e)
+        return Response({'error': e},status=400)
 
 
 @api_view(['POST'])
@@ -72,11 +86,18 @@ def update_profile(request):
         bio = request.data.get('bio')
         image = request.FILES.get('image')
         profile = CustomProfile.objects.filter(user=request.user).first()
-        if bio:
-            profile.bio = bio
-        if image:
-            profile.image = image
-        profile.save()
+        if not profile:
+            CustomProfile.objects.create(
+                user=request.user,
+                image=image,
+                bio=bio
+            )
+        else:
+            if bio:
+                profile.bio = bio
+            if image:
+                profile.image = image
+            profile.save()
         return Response({'success':'success'}, status=200)
     except Exception as e:
         return Response({'error':f'{e}'}, status=400)

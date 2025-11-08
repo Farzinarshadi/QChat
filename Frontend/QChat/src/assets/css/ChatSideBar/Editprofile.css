@@ -78,3 +78,8 @@
 .save-icon {
     font-size: 18px;
 }
+
+/* responsive */
+@media (max-width:800) {
+
+}

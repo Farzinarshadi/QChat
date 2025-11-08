@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import ChatSideBar from '../components/Chat/ChatSideBar'
 import { useEffect, useState } from 'react'
 import { API_URL, privateApi } from '../config/Base'
@@ -7,23 +7,89 @@ import send from '../assets/images/paper-plane.png'
 import emojy from '../assets/images/happiness.png'
 import eyes from '../assets/images/eyes.png'
 import default_image from '../assets/images/profile.png'
-
+import ChatInfo from '../components/Chat/ChatInfo'
+import { FaArrowLeft } from "react-icons/fa6";
+import InputSec from '../components/Chat/InputSec'
+import Loading from '../components/Loading/Loading'
 
 
 export default function PrivateChat() {
+
+    function getTextDirection(text) {
+        const firstLetter = text.trim()[0];
+        if (!firstLetter) return 'ltr';
+        return /[\u0600-\u06FF]/.test(firstLetter) ? 'rtl' : 'ltr';
+    }
+
     const { sender, reciver } = useParams()
 
+    const [OpenChatInfo, setOpenChatInfo] = useState(false)
 
     const [UserName, setUserName] = useState(null)
     const [UserImage, setUserImage] = useState(null)
+    const [UserOnline, setUserOnline] = useState(null)
     const [ShowEmojy, setShowEmojy] = useState(false)
     const [InputValue, setInputValue] = useState('')
     const [Messages, setMessages] = useState([])
-    const userId = parseInt(localStorage.getItem('user_id'))
+    const [userId, setuserId] = useState(null)
+    const send_navigate = useNavigate()
+    const [IsIsLoading, setIsLoading] = useState(false)
+
+
+    const [showSidebar, setShowSidebar] = useState(window.innerWidth > 800);
+    const isChatRoute = location.pathname.startsWith('/Group/') || location.pathname.startsWith('/Friend/');
 
     const [Chats, setChats] = useState([])
 
     useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth > 800) {
+                setShowSidebar(true);
+            } else {
+                if (location.pathname.startsWith('/Group/') || location.pathname.startsWith('/Friend/')) {
+                    setShowSidebar(false)
+                } else {
+                    setShowSidebar(true)
+                }
+            }
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, [location.pathname]);
+
+    useEffect(() => {
+        if (window.innerWidth <= 800) {
+            if (location.pathname.startsWith('/Group/') || location.pathname.startsWith('/Friend/')) {
+                setShowSidebar(false);
+            } else {
+                setShowSidebar(true);
+            }
+        } else {
+            setShowSidebar(true);
+        }
+    }, [location.pathname]);
+
+    useEffect(() => {
+        document.title = 'QChat - Private Chat'
+    })
+
+    useEffect(() => {
+        setIsLoading(true)
+        privateApi.get('/auth/get_user/')
+            .then((response) => {
+                setuserId(response.data.id)
+            })
+            .catch((error) => {
+                console.log(error.response.data.error)
+            })
+            .finally(() => {
+                setIsLoading(false)
+            })
+    }, [])
+
+
+    useEffect(() => {
+        setIsLoading(true)
         privateApi.get('/chat/get_inbox_messages/')
             .then((response) => {
                 setChats(response.data)
@@ -32,27 +98,37 @@ export default function PrivateChat() {
             .catch((error) => {
                 console.log(error.response.data.error)
             })
+            .finally(() => {
+                setIsLoading(false)
+            })
     }, [])
 
     useEffect(() => {
+        setIsLoading(true)
         privateApi.get('/chat/get_messages/' + sender + '/' + reciver + '/')
             .then((response) => {
-                console.log('m', response.data)
-                if (response.data[0]?.sender === userId) {
-                    setMessages(response.data)
-                    setUserName(response.data[0]?.reciver_name)
-                    setUserImage(response.data[0]?.reciver_image)
+                const data = response.data;
+                if (data.length > 0) {
+                    setMessages(data);
+                    if (data[0].sender === userId) {
+                        setUserName(data[0].reciver_name);
+                        setUserImage(data[0].reciver_image);
+                        setUserOnline(data[0].reciver_online);
+                    } else {
+                        setUserName(data[0].sender_name);
+                        setUserImage(data[0].sender_image);
+                        setUserOnline(data[0].sender_online);
+                    }
                 } else {
-                    setMessages(response.data)
-                    setUserName(response.data[0]?.sender_name)
-                    setUserImage(response.data[0]?.sender_image)
+                    setMessages([]);
                 }
+            })
+            .catch((error) => console.log(error.response?.data?.error))
+            .finally(() => {
+                setIsLoading(false)
+            })
+    }, [sender, reciver, userId]);
 
-            })
-            .catch((error) => {
-                console.log(error.response.data.error)
-            })
-    }, [sender, reciver])
 
 
     const [socket, setSocket] = useState(null);
@@ -60,15 +136,13 @@ export default function PrivateChat() {
     useEffect(() => {
         if (!sender || !reciver) return;
 
-        const ws = new WebSocket(`ws://localhost:8000/ws/chat/${sender}/${reciver}/`);
+        const ws = new WebSocket(`wss://localhost:8000/ws/chat/${sender}/${reciver}/`);
 
         ws.onopen = () => {
-            console.log('WebSocket connected ✅');
         };
 
         ws.onmessage = (e) => {
             const data = JSON.parse(e.data);
-            console.log("new message:", data);
 
             setMessages((prev) => [...prev, {
                 id: data.id,
@@ -80,7 +154,6 @@ export default function PrivateChat() {
         };
 
         ws.onclose = () => {
-            console.log('WebSocket closed');
         };
 
         setSocket(ws);
@@ -102,126 +175,115 @@ export default function PrivateChat() {
         }
     }
 
+    const HandleOpenChatInfo = () => {
+        setOpenChatInfo(true)
+    }
+
+    useEffect(() => {
+        if (!UserName) {
+            setIsLoading(true)
+
+            privateApi.get(`/auth/get_user_with_id/${reciver}/`)
+                .then((res) => {
+                    setUserName(res.data.username);
+                    setUserImage(res.data.custom_profile?.image || null);
+                })
+                .catch((err) => console.log(err.response?.data?.error))
+                .finally(() => {
+                    setIsLoading(false)
+                })
+        }
+    }, [reciver, UserName]);
+
+    useEffect(() => {
+        const chatContainer = document.querySelector('.chat-messages-sec');
+        if (chatContainer) {
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+    }, [Messages]);
+
 
     return (
         <div className="home-main flex-center">
             <div className='chat-sec flex-center'>
-                {/* Chat Side Bar */}
-                <ChatSideBar Chats={Chats} Type='private' />
+                {
+                    IsIsLoading ? (
+                        <Loading />
+                    ) : (
+                        <>
+                            {/* Chat Side Bar */}
+                            {showSidebar && <ChatSideBar Chats={Chats} Type='private' setShowSidebar={setShowSidebar} />}
 
-                <div className="chat-main flex-jc-start">
-                    {
-                        !UserName ? (
-                            <div className="select-chat">Select a chat from sidebar</div>
-
-                        ) : (
-                            <>
-                                {/* Chat Info */}
-                                {
-                                    < div className="chat-info-section flex-jc-start">
-                                        <div className="chat-info-flex flex-center">
-                                            <img src={UserImage ? API_URL + UserImage : default_image} className='chat-profile' />
-                                            <div className="chat-name-text felx-jc-cebter">
-                                                <div className="chat-name flex-jc-start">{UserName}</div>
-                                                <div className="chat-followers flex-jc-start">is offline</div>
-                                            </div>
+                            {
+                                OpenChatInfo && (
+                                    <>
+                                        <div className="shadow" onClick={() => setOpenChatInfo(false)}></div>
+                                        <div className="fixed-box">
+                                            <ChatInfo data={reciver} type="private_chat" setOpenChatInfo={setOpenChatInfo} />
                                         </div>
-                                    </div>
-                                }
+                                    </>
+                                )
+                            }
 
-
-                                {/* Chat Messages */}
-                                <div className="chat-messages-sec flex-ai-start">
+                            {/* Chat Main */}
+                            {(isChatRoute || window.innerWidth > 800) && (
+                                <div className="chat-main flex-jc-start">
                                     {
-                                        Messages && Messages?.map((item) => (
-                                            <div key={item.id} className={`chat-message-item-sec ${userId == item.reciver ? 'reciver' : 'sender'}`}>
-                                                <div className="chat-message-item">
-                                                    <span className='message-text'>{item.message}</span>
-                                                    <div className="is_read">
-                                                        {
-                                                            item.is_read ? (
-                                                                <img src={eyes} className='seen-icon flex-center' />
-                                                            ) : (
-                                                                <span></span>
-                                                            )
-                                                        }
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))
-                                    }
-                                </div>
+                                        !UserName ? (
+                                            <div className="select-chat">Select a chat from sidebar</div>
 
-                                {/* Input Sec */}
-                                <div className="input-sec flex-jc-start">
-                                    <input
-                                        type="text"
-                                        className="chat-input"
-                                        placeholder='Write a message ...'
-                                        autoComplete='off'
-                                        value={InputValue}
-                                        onChange={(e) => setInputValue(e.target.value)}
-                                    />
-                                    {
-                                        InputValue && InputValue?.length > 0 ? (
-                                            <>
-                                                <div
-                                                    className="emojy-wrapper"
-                                                    onMouseEnter={() => setShowEmojy(true)}
-                                                    onMouseLeave={() => setShowEmojy(false)}
-                                                >
-                                                    <button
-                                                        className='chat-send-button flex-center'
-                                                    >
-                                                        <img src={emojy} className='chat-emojy-icon' />
-                                                    </button>
-
-                                                    {ShowEmojy && (
-                                                        <div className="emojy-box">
-                                                            <div className="emojy-item flex-center" onClick={() => setInputValue(InputValue + '😂')}>😂</div>
-                                                            <div className="emojy-item flex-center" onClick={() => setInputValue(InputValue + '😐')}>😐</div>
-                                                            <div className="emojy-item flex-center" onClick={() => setInputValue(InputValue + '😭')}>😭</div>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                <button
-                                                    className='chat-send-button flex-center'
-                                                    onClick={HandleSendWebsocket}
-                                                >
-                                                    <img src={send} className='chat-send-icon' />
-                                                </button>
-                                            </>
                                         ) : (
                                             <>
-                                                <div
-                                                    className="emojy-wrapper"
-                                                    onMouseEnter={() => setShowEmojy(true)}
-                                                    onMouseLeave={() => setShowEmojy(false)}
-                                                >
-                                                    <button
-                                                        className='chat-send-button flex-center'
-                                                    >
-                                                        <img src={emojy} className='chat-emojy-icon' />
-                                                    </button>
-
-                                                    {ShowEmojy && (
-                                                        <div className="emojy-box">
-                                                            <div className="emojy-item flex-center" onClick={() => setInputValue(InputValue + '😂')}>😂</div>
-                                                            <div className="emojy-item flex-center" onClick={() => setInputValue(InputValue + '😐')}>😐</div>
-                                                            <div className="emojy-item flex-center" onClick={() => setInputValue(InputValue + '😭')}>😭</div>
+                                                {/* Chat Info */}
+                                                {
+                                                    < div className="chat-info-section flex-jc-start">
+                                                        {window.innerWidth <= 800 && (
+                                                            <FaArrowLeft
+                                                                className='back-icon'
+                                                                onClick={() => send_navigate('/PrivateChat/')}
+                                                            />
+                                                        )}
+                                                        <div className="chat-info-flex flex-jc-start" onClick={HandleOpenChatInfo}>
+                                                            <img src={UserImage ? API_URL + UserImage : default_image} className='chat-profile' />
+                                                            <div className="chat-name-text flex-ai-start">
+                                                                <div className="chat-name flex-jc-start">{UserName}</div>
+                                                                <div className="chat-followers flex-jc-start">
+                                                                    {UserOnline ? 'is online' : 'is offline'}
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                    )}
+                                                    </div>
+                                                }
+
+
+                                                {/* Chat Messages */}
+                                                <div className="chat-messages-sec">
+                                                    {
+                                                        Messages && Messages?.map((item) => (
+                                                            <div key={item?.id} className={`chat-message-item-sec-flex ${userId == item.sender ? 'sender' : 'reciver'}`}>
+                                                                <div className="chat-message-item private">
+                                                                    <span
+                                                                        className="message-text private"
+                                                                        style={{ direction: getTextDirection(item.message) }}>{item?.message}</span>
+                                                                </div>
+                                                            </div>
+                                                        ))
+                                                    }
                                                 </div>
+
+                                                {/* Input Sec */}
+                                                <InputSec InputValue={InputValue} setInputValue={setInputValue} ShowEmojy={ShowEmojy} setShowEmojy={setShowEmojy} HandleSendWebsocket={HandleSendWebsocket} />
+
                                             </>
                                         )
+
                                     }
                                 </div>
-                            </>
-                        )
+                            )}
+                        </>
+                    )
 
-                    }
-                </div>
-
+                }
             </div >
         </div>
 

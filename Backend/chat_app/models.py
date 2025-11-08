@@ -7,6 +7,7 @@ class Chat(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="chat_owner")
     members = models.ManyToManyField(User, related_name='chat_members')
     verify = models.BooleanField(default=False)
+    bio = models.TextField(max_length=9999, null=True, blank=True)
 
     def __str__(self):
         return f'{self.name} - {self.owner.first_name}'
@@ -23,6 +24,20 @@ class Message(models.Model):
     class Meta:
         ordering = ['date']  
 
-
     def __str__(self):
         return f"{self.sender} - {self.reciver} - {self.message}"
+    
+
+class GroupMessage(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="group_user")
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="group_sender")
+    chat = models.ForeignKey(Chat, on_delete=models.CASCADE, related_name="chat_reciver")
+    message = models.CharField(max_length=1000)
+    is_read = models.BooleanField(default=False)
+    date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['date']  
+
+    def __str__(self):
+        return f"{self.sender} - {self.chat} - {self.message}"

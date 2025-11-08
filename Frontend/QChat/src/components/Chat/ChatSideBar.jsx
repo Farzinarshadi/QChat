@@ -2,27 +2,42 @@ import { useEffect, useState } from 'react'
 import '../../assets/css/ChatSideBar/ChatSideBar.css'
 import tick from '../../assets/images/blue tick.png'
 import { API_URL, privateApi } from '../../config/Base'
-import { Link, NavLink } from 'react-router-dom'
+import { data, Link, NavLink, useLocation } from 'react-router-dom'
 import default_image from '../../assets/images/profile.png'
 import { FaChevronRight } from "react-icons/fa";
 import EditProfile from './EditProfile'
 
 
-export default function ChatSideBar({ Chats, Type }) {
-    const userId = parseInt(localStorage.getItem('user_id'))
+export default function ChatSideBar({ Chats, Type, setShowSidebar  }) {
+    const [userId, setuserId] = useState(null)
     const [User, setUser] = useState()
     const [OpenEditProfile, setOpenEditProfile] = useState(false);
+    const location = useLocation();
 
     useEffect(() => {
-        privateApi.get('/auth/get_user/' + userId + '/')
+        if (window.innerWidth <= 800) {
+            if (location.pathname.startsWith('/Group/') || location.pathname.startsWith('/Friend/')) {
+                setShowSidebar(false);
+            } else {
+                setShowSidebar(true);
+            }
+        } else {
+            setShowSidebar(true);
+        }
+    }, [location.pathname]);
+
+    
+    useEffect(() => {
+        privateApi.get('/auth/get_user/')
             .then((response) => {
-                console.log('aaa',response.data)
+                setuserId(response.data.id)
                 setUser(response.data)
             })
             .catch((error) => {
                 console.log(error.response.data.error)
             })
     }, [])
+
 
     return (
         <div className="chat-sidebar-main flex-jc-start">
@@ -33,7 +48,7 @@ export default function ChatSideBar({ Chats, Type }) {
                     <>
                         <div className="shadow" onClick={() => setOpenEditProfile(false)}></div>
                         <div className="fixed-box">
-                            <EditProfile User={User} setOpenEditProfile={setOpenEditProfile} />   
+                            <EditProfile User={User} setOpenEditProfile={setOpenEditProfile} />
                         </div>
                     </>
                 )
@@ -42,24 +57,20 @@ export default function ChatSideBar({ Chats, Type }) {
             <div className="change-sidebar-section flex-center">
                 <NavLink
                     to='/'
-                    className={({ isActive, isPending }) =>
-                        isPending
-                            ? "change-sidebar-item flex-center"
-                            : isActive
-                                ? "change-sidebar-item flex-center active"
-                                : "change-sidebar-item flex-center"
+                    className={({ isActive }) =>
+                        window.location.pathname.startsWith('/Group/') || isActive
+                            ? "change-sidebar-item flex-center active"
+                            : "change-sidebar-item flex-center"
                     }
                 >
                     Groups
                 </NavLink>
                 <NavLink
                     to='/PrivateChat/'
-                    className={({ isActive, isPending }) =>
-                        isPending
-                            ? "change-sidebar-item flex-center"
-                            : isActive
-                                ? "change-sidebar-item flex-center active"
-                                : "change-sidebar-item flex-center"
+                    className={({ isActive }) =>
+                        window.location.pathname.startsWith('/Friend/') || isActive
+                            ? "change-sidebar-item flex-center active"
+                            : "change-sidebar-item flex-center"
                     }
                 >
                     Private
@@ -72,9 +83,12 @@ export default function ChatSideBar({ Chats, Type }) {
                     Type === 'group' ? (
                         Chats.map((item) => (
                             <Link
-                                to={`/Group/${item?.id}/`}
+                                to={`/Group/${item?.id}/${userId}/`}
                                 className='chat-sidebar-item flex-jc-start'
                                 key={item.id}
+                                onClick={() => {
+                                    if (window.innerWidth <= 800) setShowSidebar(false);
+                                }}
                             >
                                 <img src={item?.image ? API_URL + item?.image : default_image} className='chat-sidebar-item-image' />
                                 <div className="sidebar-chat-name-text felx-jc-cebter">
@@ -93,6 +107,7 @@ export default function ChatSideBar({ Chats, Type }) {
                             const isSender = String(userId) === String(item.sender)
                             const chatUserName = isSender ? item.reciver_name : item.sender_name
                             const chatUserImage = isSender ? item.reciver_image : item.sender_image
+                            const chatUserOnline = isSender ? item.reciver_online : item.sender_online
                             const chatUserId = isSender ? item.reciver : item.sender
 
                             return (
@@ -105,7 +120,7 @@ export default function ChatSideBar({ Chats, Type }) {
                                     <div className="sidebar-chat-name-text">
                                         <div className="name-and-member-count-flex flex-center">
                                             <div className="chat-item-name flex-jc-start">{chatUserName}</div>
-                                            <span className='is-online'></span>
+                                            <span className={`is-online ${chatUserOnline ? 'active' : ''}`}></span>
                                             {item.verify && <img src={tick} className='blue-tick flex-center' />}
                                         </div>
                                         <div className="user-profile-online">
@@ -129,7 +144,7 @@ export default function ChatSideBar({ Chats, Type }) {
                 <img src={User?.custom_profile?.image ? API_URL + User?.custom_profile?.image : default_image} className='user-profile-img' />
                 <div className="name-and-online-flex">
                     <div className="user-profile-name">{User?.username}</div>
-                    <div className="user-profile-online flex-jc-start">
+                    <div className="user-profile-online">
                         <span>is online</span>
                         <span className='is-online active'></span>
                     </div>

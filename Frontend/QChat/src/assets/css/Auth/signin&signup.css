@@ -74,3 +74,11 @@
 .signin-change.active {
     border-bottom: 1px solid #53FC18;
 }
+
+/* responsive */
+@media (max-width:800px) {
+    .auth-box {
+        border: 0;
+        background-color: black;
+    }
+}

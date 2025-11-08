@@ -5,6 +5,7 @@ import Signin from './pages/Signin'
 import Signup from './pages/Signup'
 import IsAuthenticated from './config/IsAuthenticated'
 import PrivateChat from './pages/PrivateChat'
+import UserStatus from './config/UserStatus'
 
 function App() {
 
@@ -13,12 +14,14 @@ function App() {
 
       <IsAuthenticated>
 
+        <UserStatus />
+
         <Routes>
           <Route path='/' element={<Chat />}/>
           <Route path='PrivateChat/' element={<PrivateChat />}/>
           <Route path='Signin/' element={<Signin />}/>
           <Route path='Signup/' element={<Signup />}/>
-          <Route path='Group/:id/' element={<Chat />}/>
+          <Route path='Group/:id/:sender/' element={<Chat />}/>
           <Route path='Friend/:sender/:reciver/' element={<PrivateChat />}/>
         </Routes>
         

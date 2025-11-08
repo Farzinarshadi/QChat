@@ -5,12 +5,15 @@ import { API_URL, privateApi } from '../../config/Base';
 import default_image from '../../assets/images/profile.png'
 import { useState, useRef, useEffect } from 'react';
 import Alert from '@mui/material/Alert';
+import Loading from '../../components/Loading/Loading'
+
 
 export default function EditProfile({ User, setOpenEditProfile }) {
 
     const [bio, setBio] = useState(User?.custom_profile?.bio || "");
     const [previewImage, setPreviewImage] = useState(User?.custom_profile?.image ? API_URL + User?.custom_profile?.image : default_image);
     const [selectedFile, setSelectedFile] = useState(null);
+    const [IsIsLoading, setIsLoading] = useState(false)
 
     const [ShowAlert, setShowAlert] = useState(false)
     const [AlertText, setAlertText] = useState('')
@@ -32,9 +35,11 @@ export default function EditProfile({ User, setOpenEditProfile }) {
 
 
     const handleSave = () => {
+        setIsLoading(true)
+
         var formData = new FormData();
-        formData.append('image',selectedFile);
-        formData.append('bio',bio);
+        formData.append('image', selectedFile);
+        formData.append('bio', bio);
 
         privateApi.post('/auth/update-profile/', formData)
             .then((response) => {
@@ -46,6 +51,9 @@ export default function EditProfile({ User, setOpenEditProfile }) {
                 setAlertText(error.response.data.error)
                 setAlertType('error')
                 setShowAlert(true)
+            })
+            .finally(() => {
+                setIsLoading(false)
             })
     };
 
@@ -59,67 +67,71 @@ export default function EditProfile({ User, setOpenEditProfile }) {
     }, [ShowAlert]);
 
     return (
-        <>
-            {ShowAlert && (
-                <Alert
-                    severity={AlertType}
-                    variant='filled'
-                    sx={{
-                        position: "fixed",
-                        top: 20,
-                        right: "50%",
-                        transform: "translateX(50%)",
-                        width: "320px",
-                        zIndex: 9999,
-                    }}
-                >
-                    {AlertText}
-                </Alert>
-            )}
+        IsIsLoading ? (
+            <Loading />
+        ) : (
+            <>
+                {ShowAlert && (
+                    <Alert
+                        severity={AlertType}
+                        variant='filled'
+                        sx={{
+                            position: "fixed",
+                            top: 20,
+                            right: "50%",
+                            transform: "translateX(50%)",
+                            width: "320px",
+                            zIndex: 9999,
+                        }}
+                    >
+                        {AlertText}
+                    </Alert>
+                )}
 
-            {/* Close Section */}
-            <div className="close-section">
-                <div className="close-title">Edit Profile</div>
-                <div className='close-icons flex-center'>
-                    <button className='save-button flex-center' onClick={handleSave}>
-                        <AiOutlineSave className='save-icon' />
-                        <span className='save-text'>Save</span>
-                    </button>
-                    <IoMdClose className='close-icon flex-center' onClick={() => setOpenEditProfile(false)} />
+                {/* Close Section */}
+                <div className="close-section">
+                    <div className="close-title">Edit Profile</div>
+                    <div className='close-icons flex-center'>
+                        <button className='save-button flex-center' onClick={handleSave}>
+                            <AiOutlineSave className='save-icon' />
+                            <span className='save-text'>Save</span>
+                        </button>
+                        <IoMdClose className='close-icon flex-center' onClick={() => setOpenEditProfile(false)} />
+                    </div>
                 </div>
-            </div>
 
-            {/* Change Image Section */}
-            <div className="account-info-section flex-jc-start">
-                <img
-                    src={previewImage}
-                    className='change-image-image'
-                    onClick={handleImageClick}
-                    style={{ cursor: "pointer" }}
-                />
-                <input
-                    type="file"
-                    accept="image/*"
-                    ref={fileInputRef}
-                    onChange={handleImageChange}
-                    style={{ display: "none" }}
-                />
-
-                <div className="change-profile-input-section flex-ai-start">
+                {/* Change Image Section */}
+                <div className="account-info-section flex-jc-start">
+                    <img
+                        src={previewImage}
+                        className='change-image-image'
+                        onClick={handleImageClick}
+                        style={{ cursor: "pointer" }}
+                    />
                     <input
-                        type="text"
-                        className="change-username-input"
-                        placeholder='Username'
-                        value={User?.username}
-                        disabled
+                        type="file"
+                        accept="image/*"
+                        ref={fileInputRef}
+                        onChange={handleImageChange}
+                        style={{ display: "none" }}
                     />
-                    <textarea
-                        className='change-bio-input'
-                        value={bio}
-                        onChange={(e) => setBio(e.target.value)}
-                    />
+
+                    <div className="change-profile-input-section flex-ai-start">
+                        <input
+                            type="text"
+                            className="change-username-input"
+                            placeholder='Username'
+                            value={User?.username}
+                            disabled
+                        />
+                        <textarea
+                            className='change-bio-input'
+                            value={bio}
+                            onChange={(e) => setBio(e.target.value)}
+                        />
+                    </div>
                 </div>
-            </div>
-        </>
+            </>
+        )
     )
 }

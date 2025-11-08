@@ -1,0 +1,44 @@
+.chat-info-main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 24px;
+}
+
+.chat-info-image {
+    width: 190px;
+    height: 190px;
+    border-radius: 50%;
+}
+
+.chat-info-username-bio {
+    flex-direction: column;
+    gap: 9px;
+}
+
+.chat-info-username-sec,
+.chat-info-bio-sec {
+    width: 320px;
+    height: 40px;
+    font-size: 17px;
+    padding: 6px 9px;
+    background-color: #17212b;
+    color: #fff;
+    border-radius: 9px;
+    box-sizing: border-box;
+}
+
+.chat-info-bio-sec {
+    min-height: 180px;
+    display: flex;
+    align-items: start;
+    justify-content: start;
+}
+
+/* responsive */
+@media (max-width:800px) {
+    .chat-info-main {
+        flex-direction: column;
+    }
+}
