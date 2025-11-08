@@ -1,4 +1,7 @@
 # 💬 QChat  
+<img width="1478" height="932" alt="image" src="https://github.com/user-attachments/assets/94636125-011c-4d1b-935e-03ba61343ff9" />
+
+
 یک اپلیکیشن چت زنده ساخته‌شده با **React** و **Django Channels**
 
 ---
